@@ -91,6 +91,7 @@ public class TTSNormalizer {
         String nextTag;
         String lastToken = "";
         StringBuilder sb = new StringBuilder();
+        String links_pattern = NormalizationDictionaries.links.get(NormalizationDictionaries.LINK_PTRN_ALL);
         for (int i=0; i < tags.length - 1; i++) {
             token = tokens[i];
             nextTag = tags[i+1];
@@ -104,36 +105,31 @@ public class TTSNormalizer {
             else if (token.length() > 1 && token.charAt(0) == token.charAt(1)) {
                 token = token.replaceAll(".", "$0 ").trim();
             }
-            else if (isURL(token))
-                token = normalizeURL(token);
+            else if (token.matches(links_pattern))
+                token = normalizeURL(token, links_pattern);
+            else if (token.matches(NormalizationDictionaries.NOT_LETTERS))
+                token = normalizeSymbols(token);
+
             sb.append(token.trim()).append(" ");
             lastToken = tokens[i+1];
         }
         sb.append(lastToken); //what if this is a digit or something that needs normalizing?
-        return sb.toString();
+        String result = sb.toString();
+        return result.replaceAll("\\s+", " ");
+
     }
 
-    private boolean isURL(String token) {
-        return token.endsWith(".is") || token.endsWith(".com") || token.endsWith(".org");
-    }
     private String replaceHyphen(String text, String domain) {
         String replacedText = text;
         boolean didReplace = false;
         String[] textArr = text.split(" ");
         for (int i = 2; i < textArr.length - 1; i++) {
-            // pattern: "digit - digit", with or without whitespace
-            if (textArr[i].equals("-") && textArr[i-1].matches("\\d+\\.?") && textArr[i+1].matches("\\d+\\.?")) {
+            // pattern: "digit - digit"
+            if (textArr[i].equals("-") && textArr[i-1].matches("\\d+\\.?(\\d+)?") && textArr[i+1].matches("\\d+\\.?(\\d+)?")) {
                 if (domain.equals("sport"))
                     textArr[i] = "";
                 else
                     textArr[i] = "til";
-                didReplace = true;
-            }
-            else if (textArr[i].matches("\\d+-\\d+")) {
-                if (domain.equals("sport"))
-                    textArr[i] = textArr[i].replace('-', ' ');
-                else
-                    textArr[i] = textArr[i].replace("-", " til ");
                 didReplace = true;
             }
         }
@@ -260,24 +256,54 @@ public class TTSNormalizer {
             Map<String, Map<String, String>> sportsDict = makeDict(numberToken, NumberHelper.TIME_SPORT_COLS); // should look like: {token: {"first_ten", "first_one","between_teams","second_ten", "second_one"}}
             normalized = fillDict(numberToken, nextTag, SportTuples.getTuples(), sportsDict, NumberHelper.TIME_SPORT_COLS);
         }
+        else if (numberToken.matches("^0\\d\\.$")) {
+            normalized = normalizeDigitOrdinal(numberToken);
+        }
+        else {
+            normalized = normalizeDigits(numberToken);
+        }
         return normalized;
     }
 
-    private String normalizeURL(String token) {
+    private String normalizeURL(String token, String pattern) {
         int ind = token.indexOf('.');
         String prefix = token.substring(0, ind);
         String suffix = token.substring(ind + 1);
+        // how can we choose which words to keep as words and which to separate?
+        prefix = prefix.replaceAll(".", "$0 ").trim();
 
-        // no vowels, separate characters
-        if (!prefix.matches(".*[aeiouyáéíóúýæö].*")) {
-            prefix = prefix.replaceAll(".", "$0 ").trim();
+        for (String symbol : NumberHelper.WLINK_NUMBERS.keySet()) {
+            prefix = prefix.replaceAll(symbol, NumberHelper.WLINK_NUMBERS.get(symbol));
         }
-        // might contain vowels, but starting with a double consonant means separate characters
-        else if (prefix.charAt(0) == prefix.charAt(1)) {
-            prefix = prefix.replaceAll(".", "$0 ").trim();
+        if (suffix.indexOf('/') > 0) {
+            String postSuffix = suffix.substring(suffix.indexOf('/'));
+            postSuffix = postSuffix.replaceAll(".", "$0 ").trim();
+            for (String symbol : NumberHelper.WLINK_NUMBERS.keySet()) {
+                postSuffix = postSuffix.replaceAll(symbol, NumberHelper.WLINK_NUMBERS.get(symbol));
+            }
+            suffix = suffix.substring(0, suffix.indexOf('/')) + " " + postSuffix;
         }
-
         return prefix + " punktur " + suffix;
+    }
+
+    private String normalizeSymbols(String token) {
+        for (String symbol : NumberHelper.DIGIT_NUMBERS.keySet()) {
+            token = token.replaceAll(symbol, NumberHelper.DIGIT_NUMBERS.get(symbol));
+        }
+        return token;
+    }
+
+    private String normalizeDigitOrdinal(String token) {
+        for (String digit : NumberHelper.DIGITS_ORD.keySet())
+            token = token.replaceAll("^0" + digit + "\\.$", "núll " + NumberHelper.DIGITS_ORD.get(digit));
+        return token;
+    }
+    private String normalizeDigits(String token) {
+        token = token.replaceAll(" ", "<sil> ");
+        for (String digit : NumberHelper.DIGIT_NUMBERS.keySet()) {
+            token = token.replaceAll(digit, NumberHelper.DIGIT_NUMBERS.get(digit));
+        }
+        return token;
     }
 
     private Map<String, Map<String, String>> makeDict(String token, String[] columns) {

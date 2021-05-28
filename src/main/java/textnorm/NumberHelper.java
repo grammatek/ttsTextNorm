@@ -81,11 +81,12 @@ public class NumberHelper {
         DIGIT_NUMBERS.put("7", " sjö");
         DIGIT_NUMBERS.put("8", " átta");
         DIGIT_NUMBERS.put("9", " níu");
-        DIGIT_NUMBERS.put("\\-", " <sil>");
+        // DIGIT_NUMBERS.put("\\-", " <sil>"); not sure about this, without context difficult to say if it should be "sil" or not
+        DIGIT_NUMBERS.put("\\-", "");
         DIGIT_NUMBERS.put("\\+", " plús");
-        DIGIT_NUMBERS.put("\\.", " punktur");
+       // DIGIT_NUMBERS.put("\\.", " punktur"); if we have more sentences being normalized, this replaces end-of-sentence dot as well. We don't want that
         DIGIT_NUMBERS.put(":", " tvípunktur");
-        DIGIT_NUMBERS.put(",", " komma");
+       // DIGIT_NUMBERS.put(",", " komma"); converts normal sentence commas, ask what this is supposed to do
         DIGIT_NUMBERS.put("\\/", " skástrik");
     }
 

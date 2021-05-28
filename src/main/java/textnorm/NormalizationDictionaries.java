@@ -19,6 +19,12 @@ public class NormalizationDictionaries {
     public static final String ACC_DAT_COMB = "ACC_DAT_COMB"; // ACC + DAT + ACC_DAT
     public static final String ACC_DAT_GEN_COMB = "ACC_DAT_GEN_COMB"; // ACC + DAT + ACC_DAT + GEN
     public static final String AMOUNT = "AMOUNT";
+    public static final String LINK_PTRN_EXTERNAL = "LINK_PTRN_EXTERNAL";
+    public static final String LINK_PTRN_INTERNAL = "LINK_PTRN_INTERNAL";
+    public static final String LINK_PTRN_MAIL = "LINK_PTRN_MAIL";
+    public static final String LINK_PTRN_HASHTAG = "LINK_PTRN_HASHTAG";
+    public static final String LINK_PTRN_ALL = "LINK_PTRN_ALL";
+
 
     //regex bits:
     public static final String MATCH_ANY = ".*";
@@ -27,6 +33,7 @@ public class NormalizationDictionaries {
     public static final String DOT = "\\."; // escaped dot
     public static final String DOT_ONE_NONE = "\\.?"; // escaped dot
     public static final String LETTERS = "[A-ZÁÉÍÓÚÝÐÞÆÖa-záéíóúýðþæö]";
+    public static final String NOT_LETTERS = "[^A-ZÁÉÍÓÚÝÐÞÆÖa-záéíóúýðþæö]";
     public static final String ALL_MONTHS = "jan(úar)?|feb(rúar)?|mars?|apr(íl)?|maí|jú[nl]í?|ág(úst)?|sep(t(ember)?)?|okt(óber)?|nóv(ember)?|des(ember)?";
     public static final String THE_CLOCK = "(núll|eitt|tvö|þrjú|fjögur|fimm|sex|sjö|átta|níu|tíu|ellefu|tólf" +
             "|((þret|fjór|fimm|sex)tán)|((sau|á|ní)tján)|tuttugu( og (eitt|tvö|þrjú|fjögur))?)";
@@ -55,9 +62,21 @@ public class NormalizationDictionaries {
                 "|handa|hjá|með(fram)?|móti?|undan|nálægt|eftir|fyrir|með|undir|við|yfir|til|auk|án|handan|innan|meðal|megin|milli|ofan|sakir|sökum|utan|vegna");
     }};
 
-    public static Map<String, String> patternSelection = new HashMap<String, String>() {{
-        put(AMOUNT, "hundr[au]ð|þúsund|milljón(ir)?");
-    }};
+    //The link patterns handle external patterns like https://mbl.is/innlent, internal patterns like https://localholst:8888,
+    //mail patterns like name@address.com, twitter handles like @handle and hashtags, e.g. #thisrules2021
+    public static Map<String, String> patternSelection = new HashMap<>();
+    static {
+        patternSelection.put(AMOUNT, "hundr[au]ð|þúsund|milljón(ir)?");
+        patternSelection.put(LINK_PTRN_EXTERNAL, "((https?:\\/\\/)?(www\\.)?([A-ZÁÐÉÍÓÚÝÞÆÖa-záðéíóúýþæö\\d\\-_\\.\\/]+)?\\.[A-ZÁÐÉÍÓÚÝÞÆÖa-záðéíóúýþæö\\d\\-_\\.\\/]+)");
+        patternSelection.put(LINK_PTRN_INTERNAL, "((file|(https?:\\/\\/)?localhost):[A-ZÁÐÉÍÓÚÝÞÆÖa-záðéíóúýþæö\\d_\\?\\/\\.=\\-\\&\\%\\#]+)");
+        patternSelection.put(LINK_PTRN_MAIL, "([A-ZÁÐÉÍÓÚÝÞÆÖa-záðéíóúýþæö\\d\\-_\\.]*@[A-ZÁÐÉÍÓÚÝÞÆÖa-záðéíóúýþæö\\d\\-_\\.]+(\\.[A-Za-z])?)");
+        patternSelection.put(LINK_PTRN_HASHTAG, "(# ?[A-ZÁÐÉÍÓÚÝÞÆÖa-záðéíóúýþæö\\d\\-_]+)");
+    }
+    public static Map<String, String> links = new HashMap<>();
+    static {
+        links.put(LINK_PTRN_ALL, "^(" + patternSelection.get(LINK_PTRN_EXTERNAL) + "|" + patternSelection.get(LINK_PTRN_INTERNAL)
+                + "|" + patternSelection.get(LINK_PTRN_MAIL) + "|" + patternSelection.get(LINK_PTRN_HASHTAG) + ")$");
+    }
 
     public static Map<String, String> preHelpDict = new HashMap<String, String>() {{
         put("(\\W|^)(?i)2ja(\\W|$)", "1xtveggjax2");

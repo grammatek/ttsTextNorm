@@ -11,11 +11,10 @@ public class NormalizationManagerTest {
 
     @Test
     public void processTest() {
-        String input = "Hollenska fjárfestingafyrirtækið EsBro hyggst reisa 15 ha (150.000 m²) gróðurhús til framleiðslu á tómötum";
+        String input = "Austlæg átt , 5 - 13 m /s síðdegis .";
         NormalizationManager manager = new NormalizationManager();
         String processed = manager.process(input);
-        assertEquals("Hollenska fjárfestingafyrirtækið EsBro hyggst reisa fimmtán hektarar ( hundrað og fimmtíu þúsund fermetrar ) " +
-                "gróðurhús til framleiðslu á tómötum .", processed);
+        assertEquals("Austlæg átt , fimm til þrettán metrar á sekúndu síðdegis .", processed);
     }
 
     @Test
@@ -39,7 +38,7 @@ public class NormalizationManagerTest {
         testSentences.put("Af því tilefni verða kynningar um allt land á hinum ýmsu deildum innann SL þriðjudaginn 18. janúar nk. ",
                 "Af því tilefni verða kynningar um allt land á hinum ýmsu deildum innann S L þriðjudaginn átjánda janúar næstkomandi .");
         testSentences.put("„ Ég kíki daglega á facebook , karfan.is , vf.is , mbl.is , kkí , og utpabroncs.com . “ ",
-                "\" Ég kíki daglega á facebook , karfan punktur is , v f punktur is , m b l punktur is , k k í , og utpabroncs punktur com . \"");
+                "\" Ég kíki daglega á facebook , k a r f a n punktur is , v f punktur is , m b l punktur is , k k í , og u t p a b r o n c s punktur com . \"");
         testSentences.put("Arnór Ingvi Traustason 57. mín. Jónas Guðni, sem er 33 ára, hóf fótboltaferil sinn árið 2001.",
                 "Arnór Ingvi Traustason fimmtugasta og sjöunda mínúta . Jónas Guðni , sem er þrjátíu og þriggja ára , hóf fótboltaferil sinn árið tvö þúsund og eitt .");
         // correct version impossible, since the tagger tags "lóð" and "byggingarreit" as dative, causing "í einni lóð og einum byggingarreit" (regina original does that as well)
@@ -48,7 +47,7 @@ public class NormalizationManagerTest {
         testSentences.put("Einnig er gert ráð fyrir að sameina lóðir og byggingarreiti við Sjávarbraut 1 - 7 í 1 lóð og 1 byggingarreit.   Miðaverð fyrir fullorðna kr. 5500 ",
                 "Einnig er gert ráð fyrir að sameina lóðir og byggingarreiti við Sjávarbraut eitt til sjö í einni lóð og einum byggingarreit . Miðaverð fyrir fullorðna krónur fimm þúsund og fimm hundruð .");
         testSentences.put("Stolt Sea Farm (SSF), fiskeldisarmur norsku skipa- og iðnaðarsamstæðunnar Stolt-Nielsen, jók sölu sína á flatfiski um 53% á öðrum ársfjórðungi 2015.",
-                "Stolt Sea Farm ( S S F ) , fiskeldisarmur norsku skipa- og iðnaðarsamstæðunnar Stolt-Nielsen , jók sölu sína á flatfiski um fimmtíu og þrjú prósent á öðrum ársfjórðungi tvö þúsund og fimmtán .");
+                "Stolt Sea Farm ( S S F ) , fiskeldisarmur norsku skipa og iðnaðarsamstæðunnar Stolt Nielsen , jók sölu sína á flatfiski um fimmtíu og þrjú prósent á öðrum ársfjórðungi tvö þúsund og fimmtán .");
         testSentences.put("Í janúarbyrjun 1983 var stofnað nýtt hlutafélag, Víkurféttir ehf. sem tók við.",
                 "Í janúarbyrjun nítján hundruð áttatíu og þrjú var stofnað nýtt hlutafélag , Víkurféttir E H F sem tók við .");
         testSentences.put("Jarðskjálfti að stærð 3,9 varð fyrir sunnan Kleifarvatn kl. 19:50 í gærkvöldi.",
@@ -66,7 +65,7 @@ public class NormalizationManagerTest {
                 "Karlar eru rétt innan við tvö prósent hjúkrunarfræðinga á Íslandi .");
         // should be "sjö fimm sjö vélarnar" (same error in original regina)
         testSentences.put("Lendingarnar eru hlutfallslega svo fáar að elstu 757 -vélarnar eru aðeins hálfnaðar hvað líftíma varðar",
-                "Lendingarnar eru hlutfallslega svo fáar að elstu sjö hundruð fimmtíu og sjö -vélarnar eru aðeins hálfnaðar hvað líftíma varðar .");
+                "Lendingarnar eru hlutfallslega svo fáar að elstu sjö hundruð fimmtíu og sjö vélarnar eru aðeins hálfnaðar hvað líftíma varðar .");
         testSentences.put("Á samanlögðu svæði Vesturlands og Vestfjarða voru 4.400 gistinætur sem jafngildir 7,5% fækkun milli ára.",
                 "Á samanlögðu svæði Vesturlands og Vestfjarða voru fjögur þúsund og fjögur hundruð gistinætur sem jafngildir sjö komma fimm prósent fækkun milli ára .");
         testSentences.put("Elvar skilaði 22 stigum, þar af 5 af 8 í þriggjastiga.",
@@ -93,6 +92,13 @@ public class NormalizationManagerTest {
         //        "Hollenska fjárfestingafyrirtækið EsBro hyggst reisa fimmtán hektara ( hundrað og fimmtíu þúsund fermetra ) gróðurhús til framleiðslu á tómötum");
         testSentences.put("Hollenska fjárfestingafyrirtækið EsBro hyggst reisa 15 ha (150.000 m²) gróðurhús til framleiðslu á tómötum",
                 "Hollenska fjárfestingafyrirtækið EsBro hyggst reisa fimmtán hektarar ( hundrað og fimmtíu þúsund fermetrar ) gróðurhús til framleiðslu á tómötum .");
+        testSentences.put("Mynd / elg@vf.is", "Mynd skástrik e l g hjá v f punktur is .");
+        testSentences.put("hefur leikið sjö leiki með U-21 árs liðinu.", "hefur leikið sjö leiki með U tuttugu og eins árs liðinu .");
+        testSentences.put("er þetta í 23. skiptið sem mótið er haldið .", "er þetta í tuttugasta og þriðja skiptið sem mótið er haldið .");
+        testSentences.put("Skráning er hafin á http://keflavik.is/fimleikar/ og ef eitthvað er óljóst er hægt að hafa samband í síma 421-6368 eða á fimleikar@keflavik.is",
+                "Skráning er hafin á h t t p tvípunktur skástrik skástrik k e f l a v i k punktur is skástrik "  +
+                        "f i m l e i k a r skástrik og ef eitthvað er óljóst er hægt að hafa samband í síma fjórir tveir einn sex þrír sex átta eða á f i m l e i k a r hjá k e f l a v i k punktur is .");
+
         return testSentences;
     }
 }

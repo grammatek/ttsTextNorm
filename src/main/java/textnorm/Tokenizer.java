@@ -162,8 +162,8 @@ public class Tokenizer {
         // for all kinds of punctuation we need to insert spaces at the correct positions
         // Patterns
         String processedToken = token;
-        String insertSpaceAfterAnywhere = "(.*)([(\\[{])(.*)";
-        String insertSpaceBeforeAnywhere = "(.+)([)\\[}])(.*)";
+        String insertSpaceAfterAnywhere = "(.*)([(\\[{\\-])(.*)";
+        String insertSpaceBeforeAnywhere = "(.+)([)\\[}\\-])(.*)";
         String insertSpaceAfterIfBeginning = "^(\")(.+)";
         String insertSpaceBeforeIfEnd = "(.+)([\":,.!?])$";
         String insertSpaceBeforeIfEndAndPunct = "(.+)([\":,.!?])(\\s[\":,.!?])$";
@@ -190,6 +190,9 @@ public class Tokenizer {
             return false;
         // a more complex combination of digits and punctuations, e.g. dates and large numbers
         if (token.matches("(\\d+[.,:]\\d+)+[,.]?"))
+            return false;
+        // telephone number, don't split on hyphen
+        if (token.matches("\\d{3}\\-?\\d{4}"))
             return false;
         if (isAbbreviation(token))
             return false;
