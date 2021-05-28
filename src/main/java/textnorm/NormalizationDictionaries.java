@@ -354,14 +354,14 @@ public class NormalizationDictionaries {
                     + DOT + ")*(\\d*1|\\d,\\d*1))) " + letter + "m" + DOT_ONE_NONE + EOS, "1x " + prefixMap.get(letter) + "metrax14");
             distanceDict.put("(" + BOS + "(" + prepositions.get(ACC_GEN) + ") " + NUMBER_EOS_NOT_1 + " " + letter + "m"
                     + DOT_ONE_NONE + EOS, "1x " + prefixMap.get(letter) + "metrax12");
-            distanceDict.put("(" + BOS + "(" + prepositions.get(ACC_GEN) + ") " + NUMBER_ANY + " " + patternSelection.get(AMOUNT) +
+            distanceDict.put("(" + BOS + "(" + prepositions.get(ACC_GEN) + ") " + NUMBER_ANY + ") " + patternSelection.get(AMOUNT) +
                     " " + letter + "m" + DOT_ONE_NONE + EOS, "1x 13x" + prefixMap.get(letter) + "metrax16");
             distanceDict.put("(" + BOS + "(" + prepositions.get(DAT) + ") " + NUMBER_EOS_NOT_1 + " " + letter + "m" +
                     DOT_ONE_NONE + EOS, "1x " + prefixMap.get(letter) + "metrumx10");
-            distanceDict.put("(" + BOS + "(" + prepositions.get(DAT) + ") " + NUMBER_ANY + " " + patternSelection.get(AMOUNT) +
+            distanceDict.put("(" + BOS + "(" + prepositions.get(DAT) + ") " + NUMBER_ANY + ") " + patternSelection.get(AMOUNT) +
                     " " + letter + "m" + DOT_ONE_NONE + EOS, "1x 11x" + prefixMap.get(letter) + "metrumx14");
             distanceDict.put("(1 )" + letter + "m" + DOT_ONE_NONE + EOS, "1x " + prefixMap.get(letter) + "metri x2");
-            distanceDict.put("([0-9]|" + patternSelection.get(AMOUNT) + ") " + letter + "m" + DOT_ONE_NONE + EOS, "1x " + prefixMap.get(letter) + "metrar x3");
+            distanceDict.put("([0-9]|" + patternSelection.get(AMOUNT) + ") " + letter + "m" + DOT_ONE_NONE + EOS, "1x " + prefixMap.get(letter) + "metrarx3");
         }
 
         return distanceDict;
@@ -558,13 +558,15 @@ public class NormalizationDictionaries {
         for (String letter : wattPrefix.keySet()) {
             electronicDict.put("(" + BOS + "(" + prepositions.get(GEN) + ") (" + NUMBER_EOS_1 + ")) " + letter + "[Ww]"
                     + DOT_ONE_NONE + "(st|h)" + DOT_ONE_NONE + EOS, "1x " + wattPrefix.get(letter) + "vattstundarx11");
-            electronicDict.put("(" + BOS + "(" + prepositions.get(DAT) + ") (" + NUMBER_EOS_NOT_1 + ")) " + letter + "[Ww]"
+            electronicDict.put("(" + BOS + "(" + prepositions.get(DAT) + ") (" + NUMBER_EOS_NOT_1 + ") " + letter + "[Ww]"
                     + DOT_ONE_NONE + "(st|h)" + DOT_ONE_NONE + EOS, "1x " + wattPrefix.get(letter) + "vattstundumx11");
             electronicDict.put("(" + BOS + "(" + prepositions.get(DAT) + ") (" + NUMBER_ANY + ") " + patternSelection.get(AMOUNT)
-                    + " " + letter + "[Ww]" + DOT_ONE_NONE + "(st|h)" + DOT_ONE_NONE + EOS, "1x 11x " + wattPrefix.get(letter) + "vattstundumx15");
+                    + ") " + letter + "[Ww]" + DOT_ONE_NONE + "(st|h)" + DOT_ONE_NONE + EOS, "1x 11x " + wattPrefix.get(letter) + "vattstundumx15");
             electronicDict.put("([02-9]|" + patternSelection.get(AMOUNT) + ") " + letter + "W" + EOS, "1x " + wattPrefix.get(letter) + "vöttx3");
             electronicDict.put("(1 )" + letter + "W" + EOS, "1x " + wattPrefix.get(letter) + "vattx2");
-
+            electronicDict.put("([02-9]|" + patternSelection.get(AMOUNT) + ") " + letter + "[Ww]" + DOT_ONE_NONE + "(st|h)" +
+                    DOT_ONE_NONE + EOS, "1x " + wattPrefix.get(letter) + "vattstundirx4");
+            //electronic_dict.update({"([02-9]|" + amounts + ") " + letter + "[Ww]\.?(st|h)\.?(\W|$)": "\g<1> " + prefix + "vattstundir \g<3>"})
             // etc. see electronic_dict.py in regina original
         }
         return electronicDict;

@@ -57,7 +57,7 @@ public class TTSNormalizer {
         }
         normalized = replaceFromDict(normalized, NormalizationDictionaries.weightDict);
         if (normalized.matches(".*\\b([pnµmcsdkN]?m|ft)\\.?\\b.*")) {
-            normalized = replaceFromDict(normalized, NormalizationDictionaries.distanceDict);
+            normalized = replaceFromDict(normalized, NormalizationDictionaries.getDistanceDict());
         }
         if (normalized.matches(".*(\\bha\\.?\\b).*|([pnµmcsdk]?m\\b\\.?)|([pnµmcsdk]?m[²2³3]).*")) {
             normalized = replaceFromDict(normalized, NormalizationDictionaries.getAreaDict());
@@ -122,7 +122,7 @@ public class TTSNormalizer {
         String[] textArr = text.split(" ");
         for (int i = 2; i < textArr.length - 1; i++) {
             // pattern: "digit - digit", with or without whitespace
-            if (textArr[i].equals("-") && textArr[i-1].matches("\\d") && textArr[i+1].matches("\\d")) {
+            if (textArr[i].equals("-") && textArr[i-1].matches("\\d+\\.?") && textArr[i+1].matches("\\d+\\.?")) {
                 if (domain.equals("sport"))
                     textArr[i] = "";
                 else
@@ -233,14 +233,20 @@ public class TTSNormalizer {
                     .collect(Collectors.toList());
             normalized = fillDict(numberToken, nextTag, mergedTupleList, cardinalThousandDict, NumberHelper.INT_COLS_THOUSAND);
         }
+        else if (numberToken.matches(NumberHelper.CARDINAL_MILLION_PTRN)) {
+            Map<String, Map<String, String>> cardinalMillionDict = makeDict(numberToken, NumberHelper.INT_COLS_MILLION); // should look like: {token: {thousands: "", hundreds: "", dozens: "", ones: ""}}
+            List<OrdinalTuple> mergedTupleList = Stream.of(CardinalThousandTuples.getTuples(), CardinalMillionTuples.getTuples())
+                    .flatMap(Collection::stream)
+                    .collect(Collectors.toList());
+            normalized = fillDict(numberToken, nextTag, mergedTupleList, cardinalMillionDict, NumberHelper.INT_COLS_MILLION);
+        }
         else if (numberToken.matches(NumberHelper.DECIMAL_THOUSAND_PTRN)) {
             Map<String, Map<String, String>> decimalDict = makeDict(numberToken, NumberHelper.DECIMAL_COLS_THOUSAND); // should look like: {token: {"first_ten", "first_one","between_teams","second_ten", "second_one"}}
 
             List<OrdinalTuple> mergedCardinalTupleList = Stream.of(CardinalOnesTuples.getTuples(), CardinalThousandTuples.getTuples())
                     .flatMap(Collection::stream)
                     .collect(Collectors.toList());
-            List<OrdinalTuple> mergedTupleList = Stream.of(DecimalThousandTuples.getTuples(), mergedCardinalTupleList,
-                    CardinalThousandTuples.getTuples())
+            List<OrdinalTuple> mergedTupleList = Stream.of(mergedCardinalTupleList, DecimalThousandTuples.getTuples())
                     .flatMap(Collection::stream)
                     .collect(Collectors.toList());
             normalized = fillDict(numberToken, nextTag, mergedTupleList, decimalDict, NumberHelper.DECIMAL_COLS_THOUSAND);
