@@ -159,6 +159,8 @@ public class TTSNormalizer {
         Matcher matcher = regex.matcher(text);
 
             while (matcher.find()) {
+                System.out.println(text);
+                System.out.println(regex.toString());
                 normalized.append(text, lastIndex, matcher.start())
                         .append(converter.apply(matcher));
                 lastIndex = matcher.end();

@@ -2,7 +2,13 @@ package textnorm;
 
 import org.junit.Test;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static org.junit.Assert.*;
@@ -11,10 +17,10 @@ public class NormalizationManagerTest {
 
     @Test
     public void processTest() {
-        String input = "Austlæg átt , 5 - 13 m /s síðdegis .";
+        String input = "Jarðstrengssamkomulagið við Nexans hljóðar upp á tæplega €1,3m og felur í sér kaup á um 9 km löngum 132 kV jarðstreng sem lagður verður milli tengivirkja Landsnets á Fitjum og í Helguvík .";
         NormalizationManager manager = new NormalizationManager();
         String processed = manager.process(input);
-        assertEquals("Austlæg átt , fimm til þrettán metrar á sekúndu síðdegis .", processed);
+        assertEquals("Hann bætti Íslandsmet sitt í fimm þúsund metra kappakstri um ellefu mínútur .", processed);
     }
 
     @Test
@@ -24,6 +30,26 @@ public class NormalizationManagerTest {
             String processed = manager.process(sent);
             assertEquals(getTestSentences().get(sent), processed);
         }
+    }
+
+    @Test
+    public void processFileTest() {
+        NormalizationManager manager = new NormalizationManager();
+        List<String> normalizedSentences = new ArrayList<>();
+        String line = "";
+        try {
+            InputStream is = getClass().getClassLoader().getResourceAsStream("content_df_string_original.txt");
+            if (is != null) {
+                BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+                while ((line = reader.readLine()) != null) {
+                    String normalized = manager.process(line);
+                    normalizedSentences.add(normalized);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
     }
 
     private Map<String, String> getTestSentences() {
@@ -98,6 +124,12 @@ public class NormalizationManagerTest {
         testSentences.put("Skráning er hafin á http://keflavik.is/fimleikar/ og ef eitthvað er óljóst er hægt að hafa samband í síma 421-6368 eða á fimleikar@keflavik.is",
                 "Skráning er hafin á h t t p tvípunktur skástrik skástrik k e f l a v i k punktur is skástrik "  +
                         "f i m l e i k a r skástrik og ef eitthvað er óljóst er hægt að hafa samband í síma fjórir tveir einn sex þrír sex átta eða á f i m l e i k a r hjá k e f l a v i k punktur is .");
+        testSentences.put("Austlæg átt, 5-13 m/s síðdegis.", "Austlæg átt , fimm til þrettán metrar á sekúndu síðdegis .");
+        testSentences.put("hlutfallið á Vestfjörðum þar sem 14,1% íbúa eru innflytjendur",
+                "hlutfallið á Vestfjörðum þar sem fjórtán komma eitt prósent íbúa eru innflytjendur .");
+        // both we and regina make this error with "mínútu" instead of "mínútur"
+        testSentences.put("Hann bætti Íslandsmet sitt í 5.000 m kappakstri um 11 mín.",
+                "Hann bætti Íslandsmet sitt í fimm þúsund metra kappakstri um ellefu mínútu .");
 
         return testSentences;
     }

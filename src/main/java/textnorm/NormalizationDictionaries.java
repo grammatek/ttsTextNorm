@@ -1,5 +1,9 @@
 package textnorm;
 
+import org.apache.commons.collections4.OrderedMap;
+import org.apache.commons.collections4.map.LinkedMap;
+import org.apache.commons.collections4.map.ListOrderedMap;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -33,6 +37,7 @@ public class NormalizationDictionaries {
     public static final String DOT = "\\."; // escaped dot
     public static final String DOT_ONE_NONE = "\\.?"; // escaped dot
     public static final String LETTERS = "[A-ZÁÉÍÓÚÝÐÞÆÖa-záéíóúýðþæö]";
+    public static final String LETTER_OR_DIGIT = "[A-ZÁÉÍÓÚÝÐÞÆÖa-záéíóúýðþæö\\d]";
     public static final String NOT_LETTERS = "[^A-ZÁÉÍÓÚÝÐÞÆÖa-záéíóúýðþæö]";
     public static final String ALL_MONTHS = "jan(úar)?|feb(rúar)?|mars?|apr(íl)?|maí|jú[nl]í?|ág(úst)?|sep(t(ember)?)?|okt(óber)?|nóv(ember)?|des(ember)?";
     public static final String THE_CLOCK = "(núll|eitt|tvö|þrjú|fjögur|fimm|sex|sjö|átta|níu|tíu|ellefu|tólf" +
@@ -316,23 +321,23 @@ public class NormalizationDictionaries {
     static {
         // not complete, see denominatordict.txt for further patterns
         denominatorDict.put("\\/kg" + DOT_ONE_NONE + EOS, " á kílóiðx1");
-        denominatorDict.put("\\/t" + DOT_ONE_NONE + EOS, "á tonniðx1");
-        denominatorDict.put("\\/ha" + DOT_ONE_NONE + EOS, "á hektarannx1");
-        denominatorDict.put("\\/mg" + DOT_ONE_NONE + EOS, "á milligrammiðx1");
-        denominatorDict.put("\\/gr" + DOT_ONE_NONE + EOS, "á grammiðx1");
-        denominatorDict.put("\\/ml" + DOT_ONE_NONE + EOS, "á millilítrannx1");
-        denominatorDict.put("\\/dl" + DOT_ONE_NONE + EOS, "á desilítrannx1");
-        denominatorDict.put("\\/l" + DOT_ONE_NONE + EOS, "á lítrannx1");
-        denominatorDict.put("\\/km" + DOT_ONE_NONE + EOS, "á kílómetrax1");
-        denominatorDict.put("\\/klst" + DOT_ONE_NONE + EOS, "á klukkustundx1");
-        denominatorDict.put("\\/kw" + DOT_ONE_NONE + "(st|h)" + DOT_ONE_NONE + EOS, "á kílóvattstundx2");
-        denominatorDict.put("\\/Mw" + DOT_ONE_NONE + "(st|h)" + DOT_ONE_NONE + EOS, "á megavattstundx2");
-        denominatorDict.put("\\/Gw" + DOT_ONE_NONE + "(st|h)" + DOT_ONE_NONE + EOS, "á gígavattstundx2");
-        denominatorDict.put("\\/Tw" + DOT_ONE_NONE + "(st|h)" + DOT_ONE_NONE + EOS, "á teravattstundx2");
-        denominatorDict.put("\\/s(ek)?" + DOT_ONE_NONE + EOS, "á sekúndux2");
-        denominatorDict.put("\\/mín" + DOT_ONE_NONE + EOS, "á mínútux1");
-        denominatorDict.put("\\/fm" + DOT_ONE_NONE + EOS, "á fermetrax1");
-        denominatorDict.put("\\/ferm" + DOT_ONE_NONE + EOS, "á fermetrax1");
+        denominatorDict.put("\\/t" + DOT_ONE_NONE + EOS, " á tonniðx1");
+        denominatorDict.put("\\/ha" + DOT_ONE_NONE + EOS, " á hektarannx1");
+        denominatorDict.put("\\/mg" + DOT_ONE_NONE + EOS, " á milligrammiðx1");
+        denominatorDict.put("\\/gr" + DOT_ONE_NONE + EOS, " á grammiðx1");
+        denominatorDict.put("\\/ml" + DOT_ONE_NONE + EOS, " á millilítrannx1");
+        denominatorDict.put("\\/dl" + DOT_ONE_NONE + EOS, " á desilítrannx1");
+        denominatorDict.put("\\/l" + DOT_ONE_NONE + EOS, " á lítrannx1");
+        denominatorDict.put("\\/km" + DOT_ONE_NONE + EOS, " á kílómetrax1");
+        denominatorDict.put("\\/klst" + DOT_ONE_NONE + EOS, " á klukkustundx1");
+        denominatorDict.put("\\/kw" + DOT_ONE_NONE + "(st|h)" + DOT_ONE_NONE + EOS, " á kílóvattstundx2");
+        denominatorDict.put("\\/Mw" + DOT_ONE_NONE + "(st|h)" + DOT_ONE_NONE + EOS, " á megavattstundx2");
+        denominatorDict.put("\\/Gw" + DOT_ONE_NONE + "(st|h)" + DOT_ONE_NONE + EOS, " á gígavattstundx2");
+        denominatorDict.put("\\/Tw" + DOT_ONE_NONE + "(st|h)" + DOT_ONE_NONE + EOS, " á teravattstundx2");
+        denominatorDict.put("\\/s(ek)?" + DOT_ONE_NONE + EOS, " á sekúndux2");
+        denominatorDict.put("\\/mín" + DOT_ONE_NONE + EOS, " á mínútux1");
+        denominatorDict.put("\\/fm" + DOT_ONE_NONE + EOS, " á fermetrax1");
+        denominatorDict.put("\\/ferm" + DOT_ONE_NONE + EOS, " á fermetrax1");
     }
 
 
@@ -354,14 +359,29 @@ public class NormalizationDictionaries {
         // see class weight_dict.py in regina
     }};
 
-    public static Map<String, String> distanceDict = new HashMap<>();
+    public static OrderedMap<String, String> distanceDict = new ListOrderedMap<>();
     public static Map<String, String> getDistanceDict() {
         if (!distanceDict.isEmpty())
             return distanceDict;
 
         Map<String, String> prefixMap = new HashMap<>();
         // first initialized with "fet", "tomma", and some cryptic patterns for "metri"
-        // TODO: have a closer look on the "metri" patterns
+
+        distanceDict.put("(" + BOS + "(" + prepositions.get(ACC_DAT_GEN_COMB) + ") " + NUMBER_EOS_1 + " )m" + DOT_ONE_NONE +
+                "( (?![kmgyabefstvö]" + DOT + ")" + LETTER_OR_DIGIT + "*" + EOS  + ")", "1x metrax14");
+        distanceDict.put("(" + BOS + "(" + prepositions.get(ACC_GEN) + ") (" + NUMBER_EOS_NOT_1 + " )m" + DOT_ONE_NONE +
+                "( (?![kmgyabefstvö]" + DOT + ")" + LETTER_OR_DIGIT + "*" + EOS  + ")", "1x metrax9x10");
+        distanceDict.put("(" + BOS + "(" + prepositions.get(ACC_GEN) + ") " + NUMBER_ANY + " " + patternSelection.get(AMOUNT) + " )m" + DOT_ONE_NONE +
+                "( (?![kmgyabefstvö]" + DOT + ")" + LETTER_OR_DIGIT + "*" + EOS  + ")", "1x 13x metrax16");
+        distanceDict.put("(" + BOS + "(" + prepositions.get(DAT) + ") (" + NUMBER_EOS_NOT_1 + " )m" + DOT_ONE_NONE +
+                "( (?![kmgyabefstvö]" + DOT + ")" + LETTER_OR_DIGIT + "*" + EOS + ")", "1x metrumx10");
+        distanceDict.put("(" + BOS + "(" + prepositions.get(DAT) + ") " + NUMBER_ANY + " " + patternSelection.get(AMOUNT) + " )m" + DOT_ONE_NONE +
+                "( (?![kmgyabefstvö]" + DOT + ")(?![kmgyabefstvö]" + DOT + ")" + LETTER_OR_DIGIT + "*" + EOS  + ")", "1x 11x metrumx14");
+        distanceDict.put("(1 )m" + DOT_ONE_NONE + "( (?![kmgyabefstvö]" + DOT + ")" + LETTER_OR_DIGIT + "*" + EOS + ")",
+                "1xmetrix2");
+        distanceDict.put("([02-9] )m" + DOT_ONE_NONE + "( (?![kmgyabefstvö]" + DOT + ")" + LETTER_OR_DIGIT + "*" + EOS  + ")",
+                "1xmetrarx2");
+
         // also píkó, nanó, míkró, njúton, in original regina
         prefixMap.put("m", "milli");
         prefixMap.put("[cs]", "senti");
@@ -372,7 +392,7 @@ public class NormalizationDictionaries {
             distanceDict.put("(" + BOS + "(" + prepositions.get(ACC_DAT_GEN_COMB) + ") ((\\d{1,2}" + DOT + ")?(\\d{3}"
                     + DOT + ")*(\\d*1|\\d,\\d*1))) " + letter + "m" + DOT_ONE_NONE + EOS, "1x " + prefixMap.get(letter) + "metrax14");
             distanceDict.put("(" + BOS + "(" + prepositions.get(ACC_GEN) + ") " + NUMBER_EOS_NOT_1 + " " + letter + "m"
-                    + DOT_ONE_NONE + EOS, "1x " + prefixMap.get(letter) + "metrax12");
+                    + DOT_ONE_NONE + EOS, "1x " + prefixMap.get(letter) + "metrax8"); // different group count from regina! (12)
             distanceDict.put("(" + BOS + "(" + prepositions.get(ACC_GEN) + ") " + NUMBER_ANY + ") " + patternSelection.get(AMOUNT) +
                     " " + letter + "m" + DOT_ONE_NONE + EOS, "1x 13x" + prefixMap.get(letter) + "metrax16");
             distanceDict.put("(" + BOS + "(" + prepositions.get(DAT) + ") " + NUMBER_EOS_NOT_1 + " " + letter + "m" +
@@ -510,15 +530,15 @@ public class NormalizationDictionaries {
         }};
 
         for (String letters : prefixTime.keySet()) {
-            timeDict.put("((\\W|^)(" + prepositions.get(ACC_DAT_GEN_COMB) + ") ((\\d{1,2}\\.)?(\\d{3}\\.?)*(\\d*1|\\d,\\d*1))) " + letters + "\\.?(\\W|$)", "1x " + prefixTime.get(letters) + "ux15");
-            timeDict.put("((\\W|^)(" + prepositions.get(DAT) + ") ((\\d{1,2}\\.)?(\\d{3}\\.?)*(\\d*[02-9]|\\d,\\d*[02-9]))) " + letters + "\\.?(\\W|$)", "1x " + prefixTime.get(letters) + "umx11");
-            timeDict.put("((\\W|^)(" + prepositions.get(DAT) + ") (((\\d{1,2}\\.)?(\\d{3}\\.?)*|\\d+)(,\\d+)?)?) " + patternSelection.get(AMOUNT) + " " + letters + "\\.?(\\W|$)", "1x 11x " + prefixTime.get(letters) + "umx15");
-            timeDict.put("((\\W|^)(" + prepositions.get(GEN) + ") ((\\d{1,2}\\.)?(\\d{3}\\.?)*(\\d*[02-9]|\\d,\\d*[02-9]))) " + letters + "\\.?(\\W|$)", "1x " + prefixTime.get(letters) + "nax11");
-            timeDict.put("((\\W|^)(" + prepositions.get(GEN) + ") (((\\d{1,2}\\.)?(\\d{3}\\.?)*|\\d+)(,\\d+)?)?) " + patternSelection.get(AMOUNT) + " " + letters + "\\.?(\\W|$)", "1x 11x " + prefixTime.get(letters) + "nax15");
+            timeDict.put("(" + BOS + "(" + prepositions.get(ACC_DAT_GEN_COMB) + ") ((\\d{1,2}\\.)?(\\d{3}\\.?)*(\\d*1|\\d,\\d*1))) " + letters + DOT_ONE_NONE + EOS, "1x " + prefixTime.get(letters) + "ux11");
+            timeDict.put("(" + BOS + "(" + prepositions.get(DAT) + ") ((\\d{1,2}\\.)?(\\d{3}\\.?)*(\\d*[02-9]|\\d,\\d*[02-9]))) " + letters + DOT_ONE_NONE + EOS, "1x " + prefixTime.get(letters) + "umx11");
+            timeDict.put("(" + BOS + "(" + prepositions.get(DAT) + ") (((\\d{1,2}\\.)?(\\d{3}\\.?)*|\\d+)(,\\d+)?)?) " + patternSelection.get(AMOUNT) + " " + letters + DOT_ONE_NONE + EOS, "1x 11x " + prefixTime.get(letters) + "umx15");
+            timeDict.put("(" + BOS + "(" + prepositions.get(GEN) + ") ((\\d{1,2}\\.)?(\\d{3}\\.?)*(\\d*[02-9]|\\d,\\d*[02-9]))) " + letters + DOT_ONE_NONE + EOS, "1x " + prefixTime.get(letters) + "nax11");
+            timeDict.put("(" + BOS + "(" + prepositions.get(GEN) + ") (((\\d{1,2}\\.)?(\\d{3}\\.?)*|\\d+)(,\\d+)?)?) " + patternSelection.get(AMOUNT) + " " + letters + DOT_ONE_NONE + EOS, "1x 11x " + prefixTime.get(letters) + "nax15");
             // added ABN: we need 'undir' ('undir x sek/klst/...')
-            timeDict.put("((\\W|^)(" + prepositions.get(ACC_DAT) + ") ((\\d{1,2}\\.)?(\\d{3}\\.?)*(\\d*[02-9]|\\d,\\d*[02-9]))) " + letters + "\\.?(\\W|$)", "1x " + prefixTime.get(letters) + "umx9");
+            timeDict.put("((\\W|^)(" + prepositions.get(ACC_DAT) + ") ((\\d{1,2}\\.)?(\\d{3}\\.?)*(\\d*[02-9]|\\d,\\d*[02-9]))) " + letters + DOT_ONE_NONE + EOS, "1x " + prefixTime.get(letters) + "umx9");
 
-            timeDict.put("(1 )" + letters + "\\.?(\\W|$)", "1x" + prefixTime.get(letters) + "ax2");
+            timeDict.put("(1 )" + letters + DOT_ONE_NONE + EOS, "1x" + prefixTime.get(letters) + "ax2");
             //TODO: this one messes up, need to give the preposition patterns priority and not allow this one to intervene. But why do they both match after one has been substituted? I.e. " ... sekúndur ..." matches the pattern above with preposition
             //timeDict.put("([02-9]|" + patternSelection.get(AMOUNT) + ") " + letters + "\\.?(\\W|$)", "1x " + prefixTime.get(letters) + "ur x3");
         }
@@ -532,17 +552,17 @@ public class NormalizationDictionaries {
         if (!currencyDict.isEmpty())
             return currencyDict;
         // krónur:
-        currencyDict.put("((\\W|^)(" + prepositions.get(DAT) + ")) kr\\.?\\-? ?((((\\d{1,2}\\.)?(\\d{3}\\.?)*|\\d+)(,\\d+)?)? " + patternSelection.get(AMOUNT) + ")(\\W|$)", "1x 6x krónumx15");
-        currencyDict.put("((\\W|^)(" + prepositions.get(GEN) + ")) kr\\.?\\-? ?((((\\d{1,2}\\.)?(\\d{3}\\.?)*|\\d+)(,\\d+)?)? " + patternSelection.get(AMOUNT) + ")(\\W|$)", "1x 6xkrónax15");
-        currencyDict.put("(\\W|^)[Kk]r\\.? ?((((\\d{1,2}\\.)?(\\d{3}\\.?)*|\\d+)(,\\d+)?)? " + patternSelection.get(AMOUNT) + ")(\\W|$)", "1x 2x krónurx11");
-        currencyDict.put("((\\W|^)(" + prepositions.get(ACC_DAT_GEN_COMB) + ") ((\\d{1,2}\\.)?(\\d{3}\\.?)*(\\d*1|\\d,\\d*1))) ?kr\\.?\\-?(\\W|$)", "1x krónux14");
-        currencyDict.put("((\\W|^)(" + prepositions.get(ACC_DAT_GEN_COMB) + ")) kr\\.?\\-? ?((\\d{1,2}\\.)?(\\d{3}\\.?)*(\\d*1|\\d,\\d*1))(\\W|$)", "1x 10x krónux14");
-        currencyDict.put("((\\W|^)(" + prepositions.get(DAT) + ") ((\\d{1,2}\\.)?(\\d{3}\\.?)*(\\d*[02-9]|\\d,\\d*[02-9]))) kr\\.?\\-?(\\W|$)", "1x krónumx10");
-        currencyDict.put("((\\W|^)(" + prepositions.get(DAT) + ") (((\\d{1,2}\\.)?(\\d{3}\\.?)*|\\d+)(,\\d+)?)? " + patternSelection.get(AMOUNT) + ") kr\\.?\\-?(\\W|$)", "1x 8xkrónumx14");
-        currencyDict.put("((\\W|^)(" + prepositions.get(DAT) + ")) kr\\.?\\-? ?((\\d{1,2}\\.)?(\\d{3}\\.?)*(\\d*[02-9]|\\d,\\d*[02-9]))(\\W|$)", "1x 9x krónumx10");
-        currencyDict.put("((\\W|^)(" + prepositions.get(GEN) + ") ((\\d{1,2}\\.)?(\\d{3}\\.?)*(\\d*[02-9]|\\d,\\d*[02-9]))) kr\\.?\\-?(\\W|$)", "1x krónax10");
-        currencyDict.put("((\\W|^)(" + prepositions.get(GEN) + ") (((\\d{1,2}\\.)?(\\d{3}\\.?)*|\\d+)(,\\d+)?)? " + patternSelection.get(AMOUNT) + ") kr\\.?\\-?(\\W|$)", "1x 8xkrónax14");
-        currencyDict.put("((\\W|^)(" + prepositions.get(GEN) + ")) kr\\.?\\-? ?((\\d{1,2}\\.)?(\\d{3}\\.?)*(\\d*[02-9]|\\d,\\d*[02-9]))(\\W|$)", "1x 9x krónax10");
+        currencyDict.put("((\\W|^)(" + prepositions.get(DAT) + ")) kr\\.?\\-? ?((((\\d{1,2}\\.)?(\\d{3}\\.?)*|\\d+)(,\\d+)?)? " + patternSelection.get(AMOUNT) + ")" + EOS, "1x 6x krónumx15");
+        currencyDict.put("((\\W|^)(" + prepositions.get(GEN) + ")) kr\\.?\\-? ?((((\\d{1,2}\\.)?(\\d{3}\\.?)*|\\d+)(,\\d+)?)? " + patternSelection.get(AMOUNT) + ")" + EOS, "1x 6xkrónax15");
+        currencyDict.put("(\\W|^)[Kk]r\\.? ?((((\\d{1,2}\\.)?(\\d{3}\\.?)*|\\d+)(,\\d+)?)? " + patternSelection.get(AMOUNT) + ")" + EOS, "1x 2x krónurx11");
+        currencyDict.put("((\\W|^)(" + prepositions.get(ACC_DAT_GEN_COMB) + ") ((\\d{1,2}\\.)?(\\d{3}\\.?)*(\\d*1|\\d,\\d*1))) ?kr\\.?\\-?" + EOS, "1x krónux14");
+        currencyDict.put("((\\W|^)(" + prepositions.get(ACC_DAT_GEN_COMB) + ")) kr\\.?\\-? ?((\\d{1,2}\\.)?(\\d{3}\\.?)*(\\d*1|\\d,\\d*1))" + EOS, "1x 10x krónux14");
+        currencyDict.put("((\\W|^)(" + prepositions.get(DAT) + ") ((\\d{1,2}\\.)?(\\d{3}\\.?)*(\\d*[02-9]|\\d,\\d*[02-9]))) kr\\.?\\-?" + EOS, "1x krónumx10");
+        currencyDict.put("((\\W|^)(" + prepositions.get(DAT) + ") (((\\d{1,2}\\.)?(\\d{3}\\.?)*|\\d+)(,\\d+)?)? " + patternSelection.get(AMOUNT) + ") kr\\.?\\-?" + EOS, "1x 8xkrónumx14");
+        currencyDict.put("((\\W|^)(" + prepositions.get(DAT) + ")) kr\\.?\\-? ?((\\d{1,2}\\.)?(\\d{3}\\.?)*(\\d*[02-9]|\\d,\\d*[02-9]))" + EOS, "1x 9x krónumx10");
+        currencyDict.put("((\\W|^)(" + prepositions.get(GEN) + ") ((\\d{1,2}\\.)?(\\d{3}\\.?)*(\\d*[02-9]|\\d,\\d*[02-9]))) kr\\.?\\-?" + EOS, "1x krónax10");
+        currencyDict.put("((\\W|^)(" + prepositions.get(GEN) + ") (((\\d{1,2}\\.)?(\\d{3}\\.?)*|\\d+)(,\\d+)?)? " + patternSelection.get(AMOUNT) + ") kr\\.?\\-?" + EOS, "1x 8xkrónax14");
+        currencyDict.put("((\\W|^)(" + prepositions.get(GEN) + ")) kr\\.?\\-? ?((\\d{1,2}\\.)?(\\d{3}\\.?)*(\\d*[02-9]|\\d,\\d*[02-9]))" + EOS, "1x 9x krónax10");
         currencyDict.put("(1 ?)kr\\.?\\-?(\\W|$)", "1xkrónax2");
         currencyDict.put("([02-9]|" + patternSelection.get(AMOUNT) + ") ?kr\\.?\\-?(\\W|$)", "1x krónurx3");
         // is this an error? (2 times group 2)
