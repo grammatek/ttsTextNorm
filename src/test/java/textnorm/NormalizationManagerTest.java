@@ -2,10 +2,9 @@ package textnorm;
 
 import org.junit.Test;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -17,10 +16,11 @@ public class NormalizationManagerTest {
 
     @Test
     public void processTest() {
-        String input = "Jarðstrengssamkomulagið við Nexans hljóðar upp á tæplega €1,3m og felur í sér kaup á um 9 km löngum 132 kV jarðstreng sem lagður verður milli tengivirkja Landsnets á Fitjum og í Helguvík .";
+        String input = "Nú líður að hausti og eru þessir 2 flokkar marg saga um hvort kosnigar fara fram í haust eða ekki . @ivarsson 7 @kefcity @dearborn 82 @kjarriarmanns @gudnyyx @siggisuper @arnar 2 Ríkislögreglustjóri afhenti nýtt og glæsilegt bifhjól til lögreglustjórans á Suðurnesjum í dag .";
         NormalizationManager manager = new NormalizationManager();
         String processed = manager.process(input);
-        assertEquals("Hann bætti Íslandsmet sitt í fimm þúsund metra kappakstri um ellefu mínútur .", processed);
+        System.out.println(processed);
+       // assertEquals("Upprunalega svæðið sem hraunlögin þöktu er áætlað hafa verið um ein komma fimm milljón kílómetra eða um helmingur Indlands .", processed);
     }
 
     @Test
@@ -34,6 +34,7 @@ public class NormalizationManagerTest {
 
     @Test
     public void processFileTest() {
+        Instant start = Instant.now();
         NormalizationManager manager = new NormalizationManager();
         List<String> normalizedSentences = new ArrayList<>();
         String line = "";
@@ -50,6 +51,19 @@ public class NormalizationManagerTest {
             e.printStackTrace();
         }
 
+        try {
+            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("normalized_df_original.txt")));
+            for (String s : normalizedSentences) {
+                writer.write(s);
+                writer.write("\n");
+            }
+            writer.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        Instant finish = Instant.now();
+        long timeElapsed = Duration.between(start, finish).toSeconds();
+        System.out.println("Total execution time was " + timeElapsed + " seconds");
     }
 
     private Map<String, String> getTestSentences() {

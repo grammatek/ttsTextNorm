@@ -71,7 +71,7 @@ public class NormalizationDictionaries {
     //mail patterns like name@address.com, twitter handles like @handle and hashtags, e.g. #thisrules2021
     public static Map<String, String> patternSelection = new HashMap<>();
     static {
-        patternSelection.put(AMOUNT, "hundr[au]ð|þúsund|milljón(ir)?");
+        patternSelection.put(AMOUNT, "(hundr[au]ð|þúsund|milljón(ir)?)");
         patternSelection.put(LINK_PTRN_EXTERNAL, "((https?:\\/\\/)?(www\\.)?([A-ZÁÐÉÍÓÚÝÞÆÖa-záðéíóúýþæö\\d\\-_\\.\\/]+)?\\.[A-ZÁÐÉÍÓÚÝÞÆÖa-záðéíóúýþæö\\d\\-_\\.\\/]+)");
         patternSelection.put(LINK_PTRN_INTERNAL, "((file|(https?:\\/\\/)?localhost):[A-ZÁÐÉÍÓÚÝÞÆÖa-záðéíóúýþæö\\d_\\?\\/\\.=\\-\\&\\%\\#]+)");
         patternSelection.put(LINK_PTRN_MAIL, "([A-ZÁÐÉÍÓÚÝÞÆÖa-záðéíóúýþæö\\d\\-_\\.]*@[A-ZÁÐÉÍÓÚÝÞÆÖa-záðéíóúýþæö\\d\\-_\\.]+(\\.[A-Za-z])?)");
@@ -205,7 +205,7 @@ public class NormalizationDictionaries {
         abbreviationDict.put("(" + MEASURE_PREFIX_DIGITS + "|" + MEASURE_PREFIX_WORDS + ")?([Mm]" + DOT + "y" + DOT + "s" + DOT_ONE_NONE + ")" + EOS, "1xmetra yfir sjávarmálix9"); // do we really need the millions here? million metres above n.n.?
         abbreviationDict.put(BOS + "([Mm]" + DOT_ONE_NONE + "v" + DOT_ONE_NONE + ")" + EOS, "1xmiðað viðx3");
         abbreviationDict.put(BOS + "([Mm]" + DOT_ONE_NONE + "t" + DOT_ONE_NONE + "t|M" + DOT_ONE_NONE + "T" + DOT_ONE_NONE + "T)"
-                + DOT_ONE_NONE, "1xmeð tilliti tilx3");
+                + DOT_ONE_NONE + EOS, "1xmeð tilliti tilx3");
         abbreviationDict.put(BOS +  "([Mm]" + DOT_ONE_NONE + "ö" + DOT_ONE_NONE + "o|M" + DOT_ONE_NONE + "Ö" + DOT_ONE_NONE + "O)"
                 + DOT_ONE_NONE + EOS, "1xmeð öðrum orðumx3");
         abbreviationDict.put(BOS + "([Mm]fl|MFL)" + DOT_ONE_NONE + EOS, "1xmeistaraflokkurx3");
@@ -280,7 +280,7 @@ public class NormalizationDictionaries {
                 "1xþar með taliðx3");
 
         abbreviationDict.put(" ((" + MEASURE_PREFIX_DIGITS + "|" + MEASURE_PREFIX_WORDS + ")( )?\\s)(þú" + DOT_ONE_NONE + ")" +
-                "( " + LETTERS + "*)?", "1xþúsundx13");
+                "( " + LETTERS + "*)?", "1xþúsundx11"); // changed from group 13 to 11
         abbreviationDict.put(" ([Mm]örg )þús" + DOT_ONE_NONE + "( " + LETTERS + "*)?", "1xþúsundx2");
 
         abbreviationDict.put("(\\d+" + DOT + ") [Áá]rg" + DOT + EOS, "1x árgangurx2");
@@ -288,18 +288,18 @@ public class NormalizationDictionaries {
         abbreviationDict.put("(\\d+" + DOT + ") útg" + DOT + EOS, "1x útgáfax2");
         abbreviationDict.put(BOS + "([Íí]sl|ÍSL)" + DOT_ONE_NONE + EOS, "1xíslenskax3");
 
-        abbreviationDict.put("([02-9])( )?°C" + EOS, "1x gráður selsíusx3");
-        abbreviationDict.put("(1)( )?°C", "1x gráða selsíusx3");
-        abbreviationDict.put("([02-9])( )?°F" + EOS, "1x gráður farenheitx3");
-        abbreviationDict.put("(1)( )?°F", "1x gráða farenheitx3");
-        abbreviationDict.put("([02-9])( )?°W" + EOS, "1x gráður vesturx3");
-        abbreviationDict.put("(1)( )?°W", "1x gráða vesturx3");
-        abbreviationDict.put("([02-9])( )?°N" + EOS, "1x gráður norðurx3");
-        abbreviationDict.put("(1)( )?°N", "1x gráða norðurx3");
-        abbreviationDict.put("([02-9])( )?°E" + EOS, "1x gráður austurx3");
-        abbreviationDict.put("(1)( )?°E", "1x gráða austurx3");
-        abbreviationDict.put("([02-9])( )?°S" + EOS, "1x gráður suðurx3");
-        abbreviationDict.put("(1)( )?°S", "1x gráða suðurx3");
+        abbreviationDict.put("([02-9])( )?°C" + EOS, "1x gráður selsíusx2"); // 3 -> 2, all entries below
+        abbreviationDict.put("(1)( )?°C", "1x gráða selsíusx2");
+        abbreviationDict.put("([02-9])( )?°F" + EOS, "1x gráður farenheitx2");
+        abbreviationDict.put("(1)( )?°F", "1x gráða farenheitx2");
+        abbreviationDict.put("([02-9])( )?°W" + EOS, "1x gráður vesturx2");
+        abbreviationDict.put("(1)( )?°W", "1x gráða vesturx2");
+        abbreviationDict.put("([02-9])( )?°N" + EOS, "1x gráður norðurx2");
+        abbreviationDict.put("(1)( )?°N", "1x gráða norðurx2");
+        abbreviationDict.put("([02-9])( )?°E" + EOS, "1x gráður austurx2");
+        abbreviationDict.put("(1)( )?°E", "1x gráða austurx2");
+        abbreviationDict.put("([02-9])( )?°S" + EOS, "1x gráður suðurx2");
+        abbreviationDict.put("(1)( )?°S", "1x gráða suðurx2");
     }
 
 
@@ -341,23 +341,24 @@ public class NormalizationDictionaries {
     }
 
 
-    public static Map<String, String> weightDict = new HashMap<String, String>() {{
-        put("((\\W|^)(" + prepositions.get(DAT) + ") ((\\d{1,2}\\.)?(\\d{3}\\.?)*(\\d*1|\\d,\\d*1))) t\\.?(\\W|$)", "1x tonnix10");
-        put("((\\W|^)(" + prepositions.get(GEN) + ") ((\\d{1,2}\\.)?(\\d{3}\\.?)*(\\d*1|\\d,\\d*1))) t\\.?(\\W|$)", "1x tonnsx10");
-        put("((\\W|^)(" + prepositions.get(DAT) + ") ((\\d{1,2}\\.)?(\\d{3}\\.?)*(\\d*[02-9]|\\d,\\d*[02-9]))) t\\.?(\\W|$)", "1x tonnumx10");
-        put("((\\W|^)(" + prepositions.get(DAT) + ") (((\\d{1,2}\\.)?(\\d{3}\\.?)*|\\d+)(,\\d+)?)?) " + patternSelection.get(AMOUNT) + " t\\.?(\\W|$)", "1 x11x tonnumx13");
+    public static Map<String, String> weightDict = new HashMap<>();
+    static {
+        weightDict.put("(" + BOS + "(" + prepositions.get(DAT) + ") ((\\d{1,2}\\.)?(\\d{3}\\.?)*(\\d*1|\\d,\\d*1))) t" + DOT_ONE_NONE + EOS, "1x tonnix10");
+        weightDict.put("(" + BOS + "(" + prepositions.get(GEN) + ") ((\\d{1,2}\\.)?(\\d{3}\\.?)*(\\d*1|\\d,\\d*1))) t" + DOT_ONE_NONE + EOS, "1x tonnsx10");
+        weightDict.put("(" + BOS + "(" + prepositions.get(DAT) + ") ((\\d{1,2}\\.)?(\\d{3}\\.?)*(\\d*[02-9]|\\d,\\d*[02-9]))) t" + DOT_ONE_NONE + EOS, "1x tonnumx9"); // changed from group 10 to 9
+        weightDict.put("(" + BOS + "(" + prepositions.get(DAT) + ") (((\\d{1,2}\\.)?(\\d{3}\\.?)*|\\d+)(,\\d+)?)?) " + patternSelection.get(AMOUNT) + " t" + DOT_ONE_NONE + EOS, "1 x11x tonnumx13");
         // usw. three more, and the same for grams
-        put("((\\W|^)(" + prepositions.get(DAT) + ") ((\\d{1,2}\\.)?(\\d{3}\\.?)*(\\d*1|\\d,\\d*1))) g\\.?(\\W|$)", "1x grammix10");
-        put("((\\W|^)(" + prepositions.get(GEN) + ") ((\\d{1,2}\\.)?(\\d{3}\\.?)*(\\d*1|\\d,\\d*1))) g\\.?(\\W|$)", "1x grammsx10");
-        put("((\\W|^)(" + prepositions.get(DAT) + ") ((\\d{1,2}\\.)?(\\d{3}\\.?)*(\\d*[02-9]|\\d,\\d*[02-9]))) g\\.?(\\W|$)", "1x grömmumx10");
-        put("((\\W|^)(" + prepositions.get(DAT) + ") (((\\d{1,2}\\.)?(\\d{3}\\.?)*|\\d+)(,\\d+)?)?) " + patternSelection.get(AMOUNT) + " g\\.?(\\W|$)", "1 x11x grömmumx13");
-        put("(1 )gr?\\.?(\\W|$)", "1xgrammx2");
-        put("([02-9]|" + patternSelection.get(AMOUNT) + ") gr?\\.?(\\W|$)", "1x grömmx3");
+        weightDict.put("(" + BOS + "(" + prepositions.get(DAT) + ") ((\\d{1,2}\\.)?(\\d{3}\\.?)*(\\d*1|\\d,\\d*1))) g" + DOT_ONE_NONE + EOS, "1x grammix10");
+        weightDict.put("(" + BOS + "(" + prepositions.get(GEN) + ") ((\\d{1,2}\\.)?(\\d{3}\\.?)*(\\d*1|\\d,\\d*1))) g" + DOT_ONE_NONE + EOS, "1x grammsx10");
+        weightDict.put("(" + BOS + "(" + prepositions.get(DAT) + ") ((\\d{1,2}\\.)?(\\d{3}\\.?)*(\\d*[02-9]|\\d,\\d*[02-9]))) g\\.?(\\W|$)", "1x grömmumx10");
+        weightDict.put("(" + BOS + "(" + prepositions.get(DAT) + ") (((\\d{1,2}\\.)?(\\d{3}\\.?)*|\\d+)(,\\d+)?)?) " + patternSelection.get(AMOUNT) + " g"+ DOT_ONE_NONE + EOS, "1 x11x grömmumx13");
+        weightDict.put("(1 )gr?" + DOT_ONE_NONE + EOS, "1xgrammx2");
+        weightDict.put("([02-9]|" + patternSelection.get(AMOUNT) + ") gr?\\.?(\\W|$)", "1x grömmx3");
 
 
         // another section for nanó/milli/míkró/píkó/attó/zeptó/yoktó-kíló/pund + grammi/gramms/grömmum, ...
         // see class weight_dict.py in regina
-    }};
+    }
 
     public static OrderedMap<String, String> distanceDict = new ListOrderedMap<>();
     public static Map<String, String> getDistanceDict() {
@@ -368,7 +369,7 @@ public class NormalizationDictionaries {
         // first initialized with "fet", "tomma", and some cryptic patterns for "metri"
 
         distanceDict.put("(" + BOS + "(" + prepositions.get(ACC_DAT_GEN_COMB) + ") " + NUMBER_EOS_1 + " )m" + DOT_ONE_NONE +
-                "( (?![kmgyabefstvö]" + DOT + ")" + LETTER_OR_DIGIT + "*" + EOS  + ")", "1x metrax14");
+                "( (?![kmgyabefstvö]" + DOT + ")" + LETTER_OR_DIGIT + "*" + EOS  + ")", "1x metrax10"); // from 14 to 10
         distanceDict.put("(" + BOS + "(" + prepositions.get(ACC_GEN) + ") (" + NUMBER_EOS_NOT_1 + " )m" + DOT_ONE_NONE +
                 "( (?![kmgyabefstvö]" + DOT + ")" + LETTER_OR_DIGIT + "*" + EOS  + ")", "1x metrax9x10");
         distanceDict.put("(" + BOS + "(" + prepositions.get(ACC_GEN) + ") " + NUMBER_ANY + " " + patternSelection.get(AMOUNT) + " )m" + DOT_ONE_NONE +
@@ -390,13 +391,13 @@ public class NormalizationDictionaries {
 
         for (String letter : prefixMap.keySet()) {
             distanceDict.put("(" + BOS + "(" + prepositions.get(ACC_DAT_GEN_COMB) + ") ((\\d{1,2}" + DOT + ")?(\\d{3}"
-                    + DOT + ")*(\\d*1|\\d,\\d*1))) " + letter + "m" + DOT_ONE_NONE + EOS, "1x " + prefixMap.get(letter) + "metrax14");
+                    + DOT + ")*(\\d*1|\\d,\\d*1))) " + letter + "m" + DOT_ONE_NONE + EOS, "1x " + prefixMap.get(letter) + "metrax10"); //14->10
             distanceDict.put("(" + BOS + "(" + prepositions.get(ACC_GEN) + ") " + NUMBER_EOS_NOT_1 + " " + letter + "m"
                     + DOT_ONE_NONE + EOS, "1x " + prefixMap.get(letter) + "metrax8"); // different group count from regina! (12)
             distanceDict.put("(" + BOS + "(" + prepositions.get(ACC_GEN) + ") " + NUMBER_ANY + ") " + patternSelection.get(AMOUNT) +
-                    " " + letter + "m" + DOT_ONE_NONE + EOS, "1x 13x" + prefixMap.get(letter) + "metrax16");
+                    " " + letter + "m" + DOT_ONE_NONE + EOS, "1x 10x " + prefixMap.get(letter) + "metrax12");
             distanceDict.put("(" + BOS + "(" + prepositions.get(DAT) + ") " + NUMBER_EOS_NOT_1 + " " + letter + "m" +
-                    DOT_ONE_NONE + EOS, "1x " + prefixMap.get(letter) + "metrumx10");
+                    DOT_ONE_NONE + EOS, "1x " + prefixMap.get(letter) + "metrumx8"); //10 -> 8
             distanceDict.put("(" + BOS + "(" + prepositions.get(DAT) + ") " + NUMBER_ANY + ") " + patternSelection.get(AMOUNT) +
                     " " + letter + "m" + DOT_ONE_NONE + EOS, "1x 11x" + prefixMap.get(letter) + "metrumx14");
             distanceDict.put("(1 )" + letter + "m" + DOT_ONE_NONE + EOS, "1x " + prefixMap.get(letter) + "metri x2");
@@ -469,7 +470,7 @@ public class NormalizationDictionaries {
                 areaDict.put("((\\W|^)(" + prepositions.get(ACC_GEN) + ") (((\\d{1,2}\\.)?(\\d{3}\\.?)*|\\d+)(,\\d+)?)?) " + patternSelection.get(AMOUNT) + " " + preprefix + letter + "m\\.?(\\W|$)",
                         "1x 13x " + dimensionBefore.get(preprefix) + prefixMeterDimension.get(letter) + "metrax16");
                 areaDict.put("((\\W|^)(" + prepositions.get(DAT) + ") ((\\d{1,2}\\.)?(\\d{3}\\.?)*(\\d*[02-9]|\\d,\\d*[02-9]))) " + preprefix + letter + "m\\.?(\\W|$)",
-                        "1x " + dimensionBefore.get(preprefix) + prefixMeterDimension.get(letter) + "metrumx10");
+                        "1x " + dimensionBefore.get(preprefix) + prefixMeterDimension.get(letter) + "metrumx8"); //10 -> 8
                 areaDict.put("((\\W|^)(" + prepositions.get(DAT) + ") (((\\d{1,2}\\.)?(\\d{3}\\.?)*|\\d+)(,\\d+)?)?) " + patternSelection.get(AMOUNT) + " " + preprefix + letter + "m\\.?(\\W|$)",
                         "1x 11x" + dimensionBefore.get(preprefix) + prefixMeterDimension.get(letter) + "metrumx14");
                 areaDict.put("(1 )" + preprefix + letter + "m\\.?(\\W|$)", "1x " + dimensionBefore.get(preprefix) + prefixMeterDimension.get(letter) + "metrix2");
@@ -496,7 +497,7 @@ public class NormalizationDictionaries {
 
         for (String letter : prefixLiter.keySet()) {
             volumeDict.put("((\\W|^)(" + prepositions.get(ACC_DAT_GEN_COMB)+ ") ((\\d{1,2}\\.)?(\\d{3}\\.?)*(\\d*1|\\d,\\d*1))) " + letter + "[Ll]\\.?(\\W|$)", "1x " + prefixLiter.get(letter) + "lítrax14x");
-            volumeDict.put("((\\W|^)(" + prepositions.get(ACC_GEN) + ") ((\\d{1,2}\\.)?(\\d{3}\\.?)*(\\d*[02-9]|\\d,\\d*[02-9]))) " + letter + "[Ll]\\.?(\\W|$)", "1 " + prefixLiter.get(letter) + "lítrax12");
+            volumeDict.put("((\\W|^)(" + prepositions.get(ACC_GEN) + ") ((\\d{1,2}\\.)?(\\d{3}\\.?)*(\\d*[02-9]|\\d,\\d*[02-9]))) " + letter + "[Ll]\\.?(\\W|$)", "1 " + prefixLiter.get(letter) + "lítrax9"); // 12->9
             volumeDict.put("((\\W|^)(" + prepositions.get(ACC_GEN) + ") (((\\d{1,2}\\.)?(\\d{3}\\.?)*|\\d+)(,\\d+)?)?) " + patternSelection.get(AMOUNT) + " " + letter + "[Ll]\\.?(\\W|$)", "1x 13x " + prefixLiter.get(letter) + "lítrax16");
             volumeDict.put("((\\W|^)(" + prepositions.get(DAT) + ") ((\\d{1,2}\\.)?(\\d{3}\\.?)*(\\d*[02-9]|\\d,\\d*[02-9]))) " + letter + "[Ll]\\.?(\\W|$)", "1x " + prefixLiter.get(letter) + "lítrumx10");
             volumeDict.put("((\\W|^)(" + prepositions.get(DAT) + ") (((\\d{1,2}\\.)?(\\d{3}\\.?)*|\\d+)(,\\d+)?)?) " + patternSelection.get(AMOUNT) + " " + letter + "[Ll]\\.?(\\W|$)", "1x 11x " + prefixLiter.get(letter) + "lítrumx14");
@@ -533,7 +534,7 @@ public class NormalizationDictionaries {
             timeDict.put("(" + BOS + "(" + prepositions.get(ACC_DAT_GEN_COMB) + ") ((\\d{1,2}\\.)?(\\d{3}\\.?)*(\\d*1|\\d,\\d*1))) " + letters + DOT_ONE_NONE + EOS, "1x " + prefixTime.get(letters) + "ux11");
             timeDict.put("(" + BOS + "(" + prepositions.get(DAT) + ") ((\\d{1,2}\\.)?(\\d{3}\\.?)*(\\d*[02-9]|\\d,\\d*[02-9]))) " + letters + DOT_ONE_NONE + EOS, "1x " + prefixTime.get(letters) + "umx11");
             timeDict.put("(" + BOS + "(" + prepositions.get(DAT) + ") (((\\d{1,2}\\.)?(\\d{3}\\.?)*|\\d+)(,\\d+)?)?) " + patternSelection.get(AMOUNT) + " " + letters + DOT_ONE_NONE + EOS, "1x 11x " + prefixTime.get(letters) + "umx15");
-            timeDict.put("(" + BOS + "(" + prepositions.get(GEN) + ") ((\\d{1,2}\\.)?(\\d{3}\\.?)*(\\d*[02-9]|\\d,\\d*[02-9]))) " + letters + DOT_ONE_NONE + EOS, "1x " + prefixTime.get(letters) + "nax11");
+            timeDict.put("(" + BOS + "(" + prepositions.get(GEN) + ") ((\\d{1,2}\\.)?(\\d{3}\\.?)*(\\d*[02-9]|\\d,\\d*[02-9]))) " + letters + DOT_ONE_NONE + EOS, "1x " + prefixTime.get(letters) + "nax9"); //changed group from 11 to 9
             timeDict.put("(" + BOS + "(" + prepositions.get(GEN) + ") (((\\d{1,2}\\.)?(\\d{3}\\.?)*|\\d+)(,\\d+)?)?) " + patternSelection.get(AMOUNT) + " " + letters + DOT_ONE_NONE + EOS, "1x 11x " + prefixTime.get(letters) + "nax15");
             // added ABN: we need 'undir' ('undir x sek/klst/...')
             timeDict.put("((\\W|^)(" + prepositions.get(ACC_DAT) + ") ((\\d{1,2}\\.)?(\\d{3}\\.?)*(\\d*[02-9]|\\d,\\d*[02-9]))) " + letters + DOT_ONE_NONE + EOS, "1x " + prefixTime.get(letters) + "umx9");
@@ -611,25 +612,14 @@ public class NormalizationDictionaries {
         return electronicDict;
     }
 
-    public static Map<String, String> restMeasurementDict = new HashMap<>() {{
-        put("((\\W|^)(" + prepositions.get(DAT) + ") ((\\d{1,2}\\.)?(\\d{3}\\.?)*(\\d*1|\\d,\\d*1))) ?\\%(\\W|$)","1x prósentix10");
-        put("((\\W|^)(" + prepositions.get(GEN)  + ") ((\\d{1,2}\\.)?(\\d{3}\\.?)*(\\d*1|\\d,\\d*1))) ?\\%(\\W|$)", "1x prósentsx10");
-        put("((\\W|^)(" + prepositions.get(DAT) + ") ((\\d{1,2}\\.)?(\\d{3}\\.?)*(\\d*[02-9]|\\d,\\d*[02-9]))) ?\\%(\\W|$)", "1x prósentumx10");
-        put("((\\W|^)(" + prepositions.get(GEN) + ") ((\\d{1,2}\\.)?(\\d{3}\\.?)*(\\d*[02-9]|\\d,\\d*[02-9]))) ?\\%(\\W|$)", "1x prósentax10");
-        put("((\\W|^)(" + prepositions.get(GEN) + ") (((\\d{1,2}\\.)?(\\d{3}\\.?)*|\\d+)(,\\d+)?)?) " + patternSelection.get(AMOUNT) + " \\%(\\W|$)", "1x 11x prósentax14");
-        put("\\%", " prósent");
-
-        // and many more, also "stk. / stykki" and "kcal / kílókaloríur"
-    }};
-
     public static Map<String, String> restDict = new HashMap<>();
     static {
-        restDict.put("(" + BOS + "(" + prepositions.get(DAT) + ") (" + NUMBER_EOS_1 + ")) ?\\%" + EOS, "1x prósentix10");
-        restDict.put("(" + BOS + "(" + prepositions.get(GEN) + ") (" + NUMBER_EOS_1 + ")) ?\\%" + EOS, "1x prósentsx10");
-        restDict.put("(" + BOS + "(" + prepositions.get(DAT) + ") (" + NUMBER_EOS_NOT_1 + ") ?\\%" + EOS, "1x prósentumx10");
+        restDict.put("(" + BOS + "(" + prepositions.get(DAT) + ") (" + NUMBER_EOS_1 + ")) ?\\%" + EOS, "1x prósentix9"); // changed from group 10 to 9 ( in the next entries as well)
+        restDict.put("(" + BOS + "(" + prepositions.get(GEN) + ") (" + NUMBER_EOS_1 + ")) ?\\%" + EOS, "1x prósentsx9");
+        restDict.put("(" + BOS + "(" + prepositions.get(DAT) + ") (" + NUMBER_EOS_NOT_1 + ") ?\\%" + EOS, "1x prósentumx9");
         restDict.put("(" + BOS + "(" + prepositions.get(DAT) + ") (" + NUMBER_ANY + ") " + patternSelection.get(AMOUNT)
                 + ")\\%" + EOS, "1x 11x prósentumx14");
-        restDict.put("(" + BOS + "(" + prepositions.get(GEN) + ") (" + NUMBER_EOS_NOT_1 + ") ?\\%" + EOS, "1x prósentax10");
+        restDict.put("(" + BOS + "(" + prepositions.get(GEN) + ") (" + NUMBER_EOS_NOT_1 + ") ?\\%" + EOS, "1x prósentax8"); // changed from 10 to 8
         restDict.put("(" + BOS + "(" + prepositions.get(GEN) + ") (" + NUMBER_ANY + ") " + patternSelection.get(AMOUNT)
                 + ")\\%" + EOS, "1x 11x prósentax14");
         restDict.put("\\%", " prósent");

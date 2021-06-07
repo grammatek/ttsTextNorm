@@ -146,23 +146,29 @@ public class TTSNormalizer {
 
     private String replaceFromDict(String text, Map<String, String> dict) {
         for (String regex : dict.keySet()) {
-            Pattern pattern = Pattern.compile(regex);
-            text = replacePattern(text, pattern, getExpression(dict.get(regex)));
+            text = replacePattern(text, regex, dict);
         }
         return text;
     }
 
     // Replace a given regex with a
-    private String replacePattern(String text, Pattern regex, Function<Matcher, String> converter) {
+    private String replacePattern(String text, String regex, Map<String, String> dict) {
         int lastIndex = 0;
         StringBuilder normalized = new StringBuilder();
-        Matcher matcher = regex.matcher(text);
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(text);
 
             while (matcher.find()) {
-                System.out.println(text);
-                System.out.println(regex.toString());
+                Function<Matcher, String> converter = getExpression(dict.get(regex));
+                //System.out.println(text);
+                //System.out.println(regex);
+                String matchRes = converter.apply(matcher);
+                if (matchRes.matches(".*null.*")) {
+                    matchRes = matchRes.substring(0, matchRes.indexOf("null"));
+                   // System.out.println(matchRes);
+                }
                 normalized.append(text, lastIndex, matcher.start())
-                        .append(converter.apply(matcher));
+                        .append(matchRes);
                 lastIndex = matcher.end();
             }
 
@@ -197,8 +203,9 @@ public class TTSNormalizer {
                 replacementPattern.append(STR);
             }
         }
-        if (replacementPattern.toString().equals(INTSTRINT))
+        if (replacementPattern.toString().equals(INTSTRINT)) {
             return match -> match.group(groupMap.get(0)) + replacementMap.get(1) + match.group(groupMap.get(2));
+        }
         if (replacementPattern.toString().equals(STRINT))
             return match -> replacementMap.get(0) + match.group(groupMap.get(1));
         if (replacementPattern.toString().equals(INTSTRINTINT))
@@ -268,24 +275,42 @@ public class TTSNormalizer {
     }
 
     private String normalizeURL(String token, String pattern) {
+        String normalized = token;
         int ind = token.indexOf('.');
-        String prefix = token.substring(0, ind);
-        String suffix = token.substring(ind + 1);
-        // how can we choose which words to keep as words and which to separate?
-        prefix = prefix.replaceAll(".", "$0 ").trim();
+        if (ind >= 2) {
+            String prefix = token.substring(0, ind);
+            String suffix = token.substring(ind + 1);
+            // how can we choose which words to keep as words and which to separate?
+            prefix = prefix.replaceAll(".", "$0 ").trim();
 
-        for (String symbol : NumberHelper.WLINK_NUMBERS.keySet()) {
-            prefix = prefix.replaceAll(symbol, NumberHelper.WLINK_NUMBERS.get(symbol));
-        }
-        if (suffix.indexOf('/') > 0) {
-            String postSuffix = suffix.substring(suffix.indexOf('/'));
-            postSuffix = postSuffix.replaceAll(".", "$0 ").trim();
             for (String symbol : NumberHelper.WLINK_NUMBERS.keySet()) {
-                postSuffix = postSuffix.replaceAll(symbol, NumberHelper.WLINK_NUMBERS.get(symbol));
+                prefix = prefix.replaceAll(symbol, NumberHelper.WLINK_NUMBERS.get(symbol));
             }
-            suffix = suffix.substring(0, suffix.indexOf('/')) + " " + postSuffix;
+            if (suffix.indexOf('/') > 0) {
+                String postSuffix = suffix.substring(suffix.indexOf('/'));
+                postSuffix = postSuffix.replaceAll(".", "$0 ").trim();
+                for (String symbol : NumberHelper.WLINK_NUMBERS.keySet()) {
+                    postSuffix = postSuffix.replaceAll(symbol, NumberHelper.WLINK_NUMBERS.get(symbol));
+                }
+                suffix = suffix.substring(0, suffix.indexOf('/')) + " " + postSuffix;
+            }
+            normalized = prefix + " punktur " + suffix;
         }
-        return prefix + " punktur " + suffix;
+        else {
+            normalized = token.replaceAll(".", "$0 ").trim();
+            for (String symbol : NumberHelper.WLINK_NUMBERS.keySet()) {
+                normalized = normalized.replaceAll(symbol, NumberHelper.WLINK_NUMBERS.get(symbol));
+            }
+            if (normalized.indexOf('/') > 0) {
+                String postSuffix = token.substring(token.indexOf('/'));
+                postSuffix = postSuffix.replaceAll(".", "$0 ").trim();
+                for (String symbol : NumberHelper.WLINK_NUMBERS.keySet()) {
+                    postSuffix = postSuffix.replaceAll(symbol, NumberHelper.WLINK_NUMBERS.get(symbol));
+                }
+                normalized = normalized.substring(0, normalized.indexOf('/')) + " " + postSuffix;
+            }
+        }
+        return normalized;
     }
 
     private String normalizeSymbols(String token) {
