@@ -13,6 +13,10 @@ import java.util.Set;
  */
 public class UnicodeMaps {
 
+    private UnicodeMaps() {
+        throw new IllegalStateException("Utility class");
+    }
+
     public static Map<Character, String> deleteCharsMap = new HashMap<>();
     static {
         deleteCharsMap.put('\u0000', ""); // <control> NULL

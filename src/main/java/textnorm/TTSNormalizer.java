@@ -172,10 +172,16 @@ public class TTSNormalizer {
                 lastIndex = matcher.end();
             }
 
-        if (lastIndex < text.length()) {
+        if (lastIndex > 0 && lastIndex < text.length()) {
+            // if the matcher has gone too far, we might need to add a space before appending the rest of 'text'
+            if (text.charAt(lastIndex-1) == ' ')
+                normalized.append(" ");
             normalized.append(text, lastIndex, text.length());
         }
-        return normalized.toString();
+        if (normalized.length() > 0)
+            return normalized.toString();
+        else
+            return text;
     }
 
     // Build the lambda expression for the replacement pattern.

@@ -16,11 +16,11 @@ public class NormalizationManagerTest {
 
     @Test
     public void processTest() {
-        String input = "Nú líður að hausti og eru þessir 2 flokkar marg saga um hvort kosnigar fara fram í haust eða ekki . @ivarsson 7 @kefcity @dearborn 82 @kjarriarmanns @gudnyyx @siggisuper @arnar 2 Ríkislögreglustjóri afhenti nýtt og glæsilegt bifhjól til lögreglustjórans á Suðurnesjum í dag .";
+        String input = "Vindmyllurnar eru hvor um sig 900 kW og samanlögð raforkuframleiðsla þeirra er áæetluð um 5,4 GWst á ári.";
         NormalizationManager manager = new NormalizationManager();
         String processed = manager.process(input);
         System.out.println(processed);
-       // assertEquals("Upprunalega svæðið sem hraunlögin þöktu er áætlað hafa verið um ein komma fimm milljón kílómetra eða um helmingur Indlands .", processed);
+        assertEquals("Vindmyllurnar eru hvor um sig níu hundruð kílóvött og samanlögð raforkuframleiðsla þeirra er áæetluð um fimm komma fjórar Gígavattstundir á ári .", processed);
     }
 
     @Test

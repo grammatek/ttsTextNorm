@@ -605,7 +605,7 @@ public class NormalizationDictionaries {
             electronicDict.put("([02-9]|" + patternSelection.get(AMOUNT) + ") " + letter + "W" + EOS, "1x " + wattPrefix.get(letter) + "vöttx3");
             electronicDict.put("(1 )" + letter + "W" + EOS, "1x " + wattPrefix.get(letter) + "vattx2");
             electronicDict.put("([02-9]|" + patternSelection.get(AMOUNT) + ") " + letter + "[Ww]" + DOT_ONE_NONE + "(st|h)" +
-                    DOT_ONE_NONE + EOS, "1x " + wattPrefix.get(letter) + "vattstundirx4");
+                    DOT_ONE_NONE + EOS, "1x " + wattPrefix.get(letter) + "vattstundirx3");
             //electronic_dict.update({"([02-9]|" + amounts + ") " + letter + "[Ww]\.?(st|h)\.?(\W|$)": "\g<1> " + prefix + "vattstundir \g<3>"})
             // etc. see electronic_dict.py in regina original
         }

@@ -51,30 +51,19 @@ public class Tokenizer {
             if (!t.matches(mAlphabetic)) {
                 tokenized = processSpecialCharacters(t.trim());
             }
-            if (!lastToken.isEmpty()) {
-                if (!isFullStopEOS(tokenized, lastToken))
-                    addToSent(sb, lastToken);
-                else {
-                    String sentence = finishSent(sb, lastToken);
-                    sentences.add(sentence);
-                    sb = new StringBuilder();
-                }
-            }
+            sb = checkLastToken(sentences, sb, lastToken, tokenized);
             // keep tokens ending with '.' for the next iteration
-            if (endsWithDot(tokenized)) {
-                lastToken = tokenized;
-                continue;
-            }
-            else
-                lastToken = "";
+            lastToken = updateLastToken(tokenized);
+            if (!lastToken.isEmpty()) continue;
 
-            sb.append(tokenized).append(" ");
-            if (isEOS(tokenized)) {
-                sentences.add(sb.toString().trim());
-                sb = new StringBuilder();
-            }
+            sb = updateStringBuilder(sentences, sb, tokenized);
         }
+        finishSentence(sentences, sb, lastToken);
 
+        return sentences;
+    }
+
+    private void finishSentence(List<String> sentences, StringBuilder sb, String lastToken) {
         // we might still have a dangling last token
         if (!lastToken.isEmpty()) {
             String sent = finishSent(sb, lastToken);
@@ -99,7 +88,36 @@ public class Tokenizer {
             else
                 sentences.add (sb.toString().trim());
         }
-        return sentences;
+    }
+
+    private StringBuilder updateStringBuilder(List<String> sentences, StringBuilder sb, String tokenized) {
+        sb.append(tokenized).append(" ");
+        if (isEOS(tokenized)) {
+            sentences.add(sb.toString().trim());
+            sb = new StringBuilder();
+        }
+        return sb;
+    }
+
+    private String updateLastToken(String tokenized) {
+        if (endsWithDot(tokenized)) {
+            return tokenized;
+        }
+        else
+           return "";
+    }
+
+    private StringBuilder checkLastToken(List<String> sentences, StringBuilder sb, String lastToken, String tokenized) {
+        if (!lastToken.isEmpty()) {
+            if (!isFullStopEOS(tokenized, lastToken))
+                addToSent(sb, lastToken);
+            else {
+                String sentence = finishSent(sb, lastToken);
+                sentences.add(sentence);
+                sb = new StringBuilder();
+            }
+        }
+        return sb;
     }
 
     // 'token' might end with " .", delete the space, because we are dealing with an

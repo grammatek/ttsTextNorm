@@ -9,11 +9,11 @@ public class TTSUnicodeNormalizerTest {
     public void unicodeNormalizingTest() {
         TTSUnicodeNormalizer normalizer = new TTSUnicodeNormalizer();
         String input = "„ Við vorum samheldnir og þéttir og það er gott að innbyrða sigur á útivelli gegn öflugu liði eins og Breiðabliki , “ sagði Willum Þór Þórsson";
-        String normalized = normalizer.normalize_encoding(input);
+        String normalized = normalizer.normalizeEncoding(input);
         assertEquals("\" Við vorum samheldnir og þéttir og það er gott að innbyrða sigur á útivelli gegn öflugu liði eins og Breiðabliki , \" sagði Willum Þór Þórsson", normalized);
 
         input = "sem hefur gert henni kleyft að nýta sýningarrými – og rými almennt – með nýjum hætti";
-        normalized = normalizer.normalize_encoding(input);
+        normalized = normalizer.normalizeEncoding(input);
         assertEquals("sem hefur gert henni kleyft að nýta sýningarrými - og rými almennt - með nýjum hætti", normalized);
     }
 }
